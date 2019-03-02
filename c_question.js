@@ -1,47 +1,37 @@
 const R = require('ramda');
-var stdin = require('fs').readFileSync('/dev/stdin', 'utf8');
 
 (stdin => {
-  // Define Function
 
-  // Declare Variable
-  const inputs  = stdin.toString().trim().split('\n');
+  // convert code
+  const convert = list => R.map(c => parseInt(R
+    .replace('g', 0, c)
+    .replace('c', 1, c)
+    .replace('p', 2, c)), list, 10)
 
-  // Main Procedure
-  const result = ((lines) => {
+  // judge code
 
-    return lines;
+  const judge = (a, b) => R.modulo(R.add(R.subtract(b, a), 3), 3);
 
-  })(inputs);
+  // countWinLose code
 
-  const jyanken = result;
-  R.invertObj(jyanken);
+  const countWinLose = f => ((acc, [car, cdr]) => {
+    acc[f(car, cdr)] += 1
+    return acc
+  })
+  // inputs code
+  const inputs = R.split('\n', stdin);
+  // Main code
+  const result = ((N, matrix) => {
+    const countTable = [0, 0, 0]
+    const countadd = countWinLose(judge)
+    return R.map(convert, matrix)
+      .reduce(countadd, countTable)
+      .slice(1, Infinity, countTable)
+  })(inputs.shift(), R.map(v => v.split(' '), inputs));
 
-  // first Number
-  var line = inputs[0];
-  var cols = line.split(' ').map(Number);
-
-  var a_victory = 0;
-  var b_victory = 0;
-
-  // jyanken pattern
-  var a_victory = 0;
-  var b_victory = 0;
-  for (var i = 1; i < cols[0] + 1; i++) {
-      var pattern = R.split(' ', jyanken[i]);
-      var a = pattern[0];
-      var b = pattern[1];
-      if ((a == 'g' && b == 'c') || (a == 'c' && b == 'p') || (a == 'p' && b == 'g')) {
-          a_victory += 1;
-      } else if ((b == 'g' && a == 'c') || (b == 'c' && a == 'p') || (b == 'p' && a == 'g')) {
-          b_victory += 1;
-      } else {
-          a_victory += 0;
-          b_victory += 0;
-      }
-  }
-
-  console.log(a_victory);
-  console.log(b_victory);
+  console.log(R.join('\n', result));
 
 })(require('fs').readFileSync('/dev/stdin', 'utf8'));
+
+
+
